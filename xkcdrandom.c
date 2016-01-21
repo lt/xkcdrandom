@@ -19,7 +19,7 @@ static struct class *device_class = NULL;
 static bool spam = 0;
 static char value = 52; // "4"
 
-module_param(spam, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+module_param(spam, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 MODULE_PARM_DESC(spam, "Don't stop");
 module_param(value, byte, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 MODULE_PARM_DESC(value, "What to output");
