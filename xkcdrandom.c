@@ -1,4 +1,5 @@
 #include <linux/module.h>
+#include <linux/moduleparam.h>
 #include <linux/slab.h>
 #include <linux/fs.h>
 #include <linux/cdev.h>
@@ -15,21 +16,29 @@ static dev_t device_num = 0;
 static struct cdev *device_cdev = NULL;
 static struct class *device_class = NULL;
 
+static bool spam = 0;
+static char value = 52; // "4"
+
+module_param(spam, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+MODULE_PARM_DESC(spam, "Don't stop");
+module_param(value, byte, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+MODULE_PARM_DESC(value, "What to output");
+
 struct file_operations fops = {
-		.owner =    THIS_MODULE,
-		.read =     device_read,
-		.write =    device_write,
-		.open =     device_open,
-		.release =  device_close
+	.owner =    THIS_MODULE,
+	.read =     device_read,
+	.write =    device_write,
+	.open =     device_open,
+	.release =  device_close
 };
 
 ssize_t device_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
 {
-	if (*f_pos > 0) {
+	if (spam == 0 && *f_pos > 0) {
 		return 0;
 	}
 
-	if (copy_to_user(buf, "4", 1) != 0) {
+	if (copy_to_user(buf, &value, 1) != 0) {
 		return -EFAULT;
 	}
 
