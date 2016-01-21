@@ -29,6 +29,12 @@ struct file_operations fops = {
 	.read =     device_read
 };
 
+static int device_uevent(struct device *dev, struct kobj_uevent_env *env)
+{
+	add_uevent_var(env, "DEVMODE=%#o", 0444);
+	return 0;
+}
+
 ssize_t device_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
 {
 	if (spam == 0 && *f_pos > 0) {
@@ -76,6 +82,7 @@ static int __init mod_init(void)
 		printk(KERN_WARNING "class_create failed (%d)", errno);
 		goto fail;
 	}
+	device_class->dev_uevent = device_uevent;
 
 	device_cdev = kzalloc(sizeof(struct cdev), GFP_KERNEL);
 	if (device_cdev == NULL) {
