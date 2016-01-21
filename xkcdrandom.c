@@ -26,10 +26,7 @@ MODULE_PARM_DESC(value, "What to output");
 
 struct file_operations fops = {
 	.owner =    THIS_MODULE,
-	.read =     device_read,
-	.write =    device_write,
-	.open =     device_open,
-	.release =  device_close
+	.read =     device_read
 };
 
 ssize_t device_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
@@ -44,26 +41,6 @@ ssize_t device_read(struct file *filp, char __user *buf, size_t count, loff_t *f
 
 	*f_pos += 1;
 	return 1;
-}
-
-ssize_t device_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos)
-{
-	return -EPERM;
-}
-
-int device_open(struct inode *inode, struct file *filp)
-{
-	if (inode->i_cdev != device_cdev || inode->i_rdev != device_num) {
-		printk(KERN_WARNING "WTF?");
-		return -ENODEV;
-	}
-
-	return 0;
-}
-
-int device_close(struct inode *inode, struct file *filp)
-{
-	return 0;
 }
 
 static void mod_cleanup(void)
